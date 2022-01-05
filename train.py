@@ -227,9 +227,9 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     logger.info('Image sizes %g train, %g test\n'
                 'Using %g dataloader workers\nLogging results to %s\n'
                 'Starting training for %g epochs...' % (imgsz, imgsz_test, dataloader.num_workers, save_dir, epochs))
-    
+
     torch.save(model, wdir / 'init.pt')
-    
+
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
         model.train()
 
@@ -336,6 +336,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                     results, maps, times = test.test(opt.data,
                                                  batch_size=batch_size*2,
                                                  imgsz=imgsz_test,
+                                                 conf_thres= opt.hyp.conf_thres,#0.001,
                                                  model=ema.ema.module if hasattr(ema.ema, 'module') else ema.ema,
                                                  single_cls=opt.single_cls,
                                                  dataloader=testloader,
@@ -423,7 +424,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                     torch.save(ckpt, wdir / 'epoch_{:03d}.pt'.format(epoch))
                 if epoch >= (epochs-5):
                     torch.save(ckpt, wdir / 'last_{:03d}.pt'.format(epoch))
-                elif epoch >= 420: 
+                elif epoch >= 420:
                     torch.save(ckpt, wdir / 'last_{:03d}.pt'.format(epoch))
                 del ckpt
         # end epoch ----------------------------------------------------------------------------------------------------
